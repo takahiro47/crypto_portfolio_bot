@@ -61,7 +61,7 @@ class TimeScaleDBUtil:
         
         df = pd.read_sql_query(sql, self._engine, dtype=dtype)
         if len(index_column) > 0:
-            df = df.set_index(index_column)
+            df = df.set_index(index_column, drop = True)
         return df
     
     def sql_execute(self, sql = None):
@@ -135,7 +135,7 @@ class TimeScaleDBUtil:
             _to_decimal = lambda x: Decimal(x)
             _df['price'] = _df['price'].apply(_to_decimal)
             _df['volume'] = _df['volume'].apply(_to_decimal)
-            _df['dollar_volume'] = _df['dollar_volume'].apply(_to_decimal)
+            _df['volume'] = _df['volume'].apply(_to_decimal)
             _df['dollar_cumsum'] = _df['dollar_cumsum'].apply(_to_decimal)
             _df['dollar_buy_cumsum'] = _df['dollar_buy_cumsum'].apply(_to_decimal)
             _df['dollar_sell_cumsum'] = _df['dollar_sell_cumsum'].apply(_to_decimal)
@@ -222,7 +222,7 @@ class TimeScaleDBUtil:
     def get_timebar_table_name(self, exchange, symbol, interval):
         return (f'{exchange}_{symbol}_timebar_{interval}').lower()
 
-    def init_timebar_table(self, exchange='ftx', symbol='BTC-PERP', interval=10_000_000, force=False):    
+    def init_timebar_table(self, exchange='ftx', symbol='BTC-PERP', interval='1h', force=False):    
         _table_name = self.get_timebar_table_name(exchange, symbol, interval)
         
         _df = self.read_sql_query(f"select * from information_schema.tables where table_name='{_table_name}'")
